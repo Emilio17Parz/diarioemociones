@@ -10,7 +10,7 @@ function notice(message,bad=false){$('notice').textContent=message;$('notice').c
 function complete(e){return !!e&&['place','emotion','story','thought','reflection','behavior','lesson','person'].every(k=>e[k]?.trim())&&!!e.photo}
 function status(e){return complete(e)?'Completo':e?'Borrador':'Pendiente'}
 function persist(next){const task=writeQueue.then(()=>new Promise((resolve,reject)=>{const tx=db.transaction('diary','readwrite');tx.objectStore('diary').put(next,'data');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('Guardado cancelado'));}));writeQueue=task.catch(()=>{});return task}
-async function commit(next){await persist(next);state=next}
+async function commit(next){await persist(next);state=next;window.dispatchEvent(new Event("diary-saved"))}
 function currentEntry(){const entry={};keys.forEach(k=>entry[k]=$(k).value.trim());entry.intensity=Number($('intensity').value);entry.photo=picture;return entry}
 function profileValues(){return Object.fromEntries(Object.keys(profileLabels).map(k=>[k,$('profile-'+k).value.trim()]))}
 function showPhoto(){const show=!!picture;$('photo-figure').hidden=!show;if(show)$('photo-preview').src=picture;else $('photo-preview').removeAttribute('src')}
